@@ -5,7 +5,7 @@ import { throwError } from 'rxjs';
 import { map } from 'rxjs';
 
 
-const apiUrl = 'https://flix-search-2021.herokuapp.com';
+const apiUrl = 'https://flix-search-2021.herokuapp.com/';
 @Injectable({
   providedIn: 'root'
 })
@@ -18,17 +18,17 @@ export class UserRegistrationService {
 
 
   //Making the api call for the user registration endpoint
-  public userRegistration(userDetails: any): Observable<any> {
-    console.log(userDetails);
-    return this.http.post(apiUrl + 'users', userDetails).pipe(
+  public userRegistration(userData: any): Observable<any> {
+    console.log(userData);
+    return this.http.post(apiUrl + 'users', userData).pipe(
       catchError(this.handleError)
     );
   }
 
   // User login
-  public userLogin(userDetails: any): Observable<any> {
-    console.log(userDetails);
-    return this.http.get(apiUrl + 'login', userDetails).pipe(
+  public userLogin(userDeta: any): Observable<any> {
+    console.log(userDeta);
+    return this.http.get(apiUrl + 'login', userDeta).pipe(
       catchError(this.handleError)
     );
   }
@@ -68,7 +68,7 @@ export class UserRegistrationService {
   //get director
   getDirector(): Observable<any> {
     const token = localStorage.getItem('token');
-    return this.http.get(apiUrl + '/directors/:name', {
+    return this.http.get(apiUrl + 'directors/:name', {
       headers: new HttpHeaders
         (
           {
@@ -83,7 +83,7 @@ export class UserRegistrationService {
   //get director
   getGenre(): Observable<any> {
     const token = localStorage.getItem('token');
-    return this.http.get(apiUrl + '/genre/:name', {
+    return this.http.get(apiUrl + 'genre/:name', {
       headers: new HttpHeaders
         (
           {
