@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-movie-view',
@@ -7,7 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MovieViewComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      Title: String,
+      ImageUrl: any,
+      Description: string,
+      Genre: string,
+    }
+  ) { }
 
   ngOnInit(): void {
   }
