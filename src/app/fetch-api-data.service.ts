@@ -5,6 +5,7 @@ import { throwError } from 'rxjs';
 import { map } from 'rxjs';
 
 
+
 const apiUrl = 'https://flix-search-2021.herokuapp.com/';
 @Injectable({
   providedIn: 'root'
@@ -26,9 +27,9 @@ export class UserRegistrationService {
   }
 
   // User login
-  public userLogin(userDeta: any): Observable<any> {
-    console.log(userDeta);
-    return this.http.post(apiUrl + 'login', userDeta).pipe(
+  public userLogin(userData: any): Observable<any> {
+    console.log(userData);
+    return this.http.post(apiUrl + 'login', userData).pipe(
       catchError(this.handleError)
     );
   }
@@ -80,7 +81,7 @@ export class UserRegistrationService {
     );
   }
 
-  //get director
+  //get genre
   getGenre(): Observable<any> {
     const token = localStorage.getItem('token');
     return this.http.get(apiUrl + 'genre/:name', {
@@ -175,7 +176,7 @@ export class UserRegistrationService {
     );
   }
 
-  // Update user profile
+  // Delete user profile
   public deleteUserProfile(): Observable<any> {
     const token = localStorage.getItem('token');
     const Username = localStorage.getItem('Username');
