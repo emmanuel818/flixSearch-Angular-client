@@ -49,7 +49,7 @@ export class ProfileViewComponent implements OnInit {
     this.fetchApiData.getUser(user).subscribe((resp: any) => {
       this.FavMovies = resp.FavoriteMovies;
       console.log(this.FavMovies);
-      return this.FavMovies;
+      return this.getFavoriteMovies;
     });
   }
 
