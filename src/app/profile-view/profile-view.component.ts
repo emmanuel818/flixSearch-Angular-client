@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { UserRegistrationService, User } from '../fetch-api-data.service';
+import { Router } from '@angular/router'
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
-import { UserRegistrationService } from '../fetch-api-data.service';
+;
+
 import { MovieViewComponent } from '../movie-view/movie-view.component';
 import { GenreViewComponent } from '../genre-view/genre-view.component';
 import { DirectorViewComponent } from '../director-view/director-view.component';
@@ -14,10 +16,10 @@ import { UpdateUserComponent } from '../update-user/update-user.component';
   styleUrls: ['./profile-view.component.scss']
 })
 export class ProfileViewComponent implements OnInit {
-  user: any = localStorage.getItem('Username');
-  favs: any = null;
+  user: any = {};
+  Username = localStorage.getItem('user');
 
-
+  FavMovies: any[] = [];
 
   constructor(
     public fetchApiData: UserRegistrationService,
@@ -27,18 +29,59 @@ export class ProfileViewComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getCurrentUser();
+    this.getUserInfo();
+    this.getFavoriteMovies();
   }
 
-  getCurrentUser(): void {
-    this.fetchApiData.getUser().subscribe((resp: any) => {
-      this.user = resp;
-      this.favs = resp.Favorites;
-      console.log(this.user)
-      return (this.user, this.favs);
+  getUserInfo(): void {
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.fetchApiData.getUser(user).subscribe((resp: User) => {
+        this.user = resp;
+
+        console.log(this.user);
+      });
+    }
+  }
+
+  getFavoriteMovies(): void {
+    const user = localStorage.getItem('user');
+    this.fetchApiData.getUser(user).subscribe((resp: any) => {
+      this.FavMovies = resp.FavoriteMovies;
+      console.log(this.FavMovies);
+      return this.FavMovies;
     });
   }
 
+  removeFavoriteMovie(MovieId: string, title: string): void {
+    this.fetchApiData.deleteFavoriteMovies(MovieId).subscribe((resp: any) => {
+      console.log(resp);
+      this.snackBar.open(
+        `${title} has been removed from your favorites!`,
+        'OK',
+        {
+          duration: 4000,
+        }
+      );
+      this.ngOnInit();
+    });
+  }
+
+  deleteUser(): void {
+    this.fetchApiData.deleteUserProfile(this.Username).subscribe(() => {
+      this.snackBar.open(`${this.Username} has been removed!`, 'OK', {
+        duration: 4000,
+      });
+      localStorage.clear();
+    });
+    this.router.navigate(['welcome']);
+  }
+
+  openEditUserProfile(): void {
+    this.dialog.open(UpdateUserComponent, {
+      width: '500px'
+    });
+  }
 
   openSynopsisDialog(title: string, imageUrl: any, description: string, genre: string): void {
     this.dialog.open(MovieViewComponent, {
@@ -74,51 +117,12 @@ export class ProfileViewComponent implements OnInit {
         Name: name,
         Bio: bio,
         Birthyear: birthyear,
-        Deathyear: deathyear,
+        Deathyear: deathyear
       },
       width: '500px'
     });
   }
 
 
-  openEditUserProfile(): void {
-    this.dialog.open(UpdateUserComponent, {
-      width: '500px'
-    });
-  }
 
-  getFavorites(): void {
-    let movies: any[] = [];
-    this.fetchApiData.getAllMovies().subscribe((resp: any) => {
-      movies = resp;
-      movies.forEach((movie: any) => {
-        if (this.user.favorites.includes(movie._id)) {
-          this.favs.push(movie);
-        }
-      });
-    });
-    return this.favs;
-  }
-
-  removeFavorites(id: string): void {
-    this.fetchApiData.deleteFavoriteMovies(id).subscribe((resp: any) => {
-      this.snackBar.open('Movie was removed from Favorites', 'OK', {
-        duration: 2000,
-      });
-      this.ngOnInit();
-      return this.favs;
-    })
-  }
-
-  deleteProfile(): void {
-    if (confirm('Are you sure? This cannot be undone')) {
-      this.router.navigate(['welcome']).then(() => {
-        this.snackBar.open('Your profile was deleted', 'OK', { duration: 6000 });
-      });
-      this.router.navigate(['welcome'])
-      this.fetchApiData.deleteUserProfile().subscribe(() => {
-        localStorage.clear();
-      })
-    }
-  }
 }

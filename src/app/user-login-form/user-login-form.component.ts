@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 })
 export class UserLoginFormComponent implements OnInit {
 
-  @Input() userData = { Username: '', Password: '' };
+  @Input() loginData = { Username: '', Password: '' };
   constructor(
     public fetchApiData: UserRegistrationService,
     public dialogRef: MatDialogRef<UserLoginFormComponent>,
@@ -30,20 +30,16 @@ export class UserLoginFormComponent implements OnInit {
 
   // This is the function responsible for sending the form inputs to the backend
   loginUser(): void {
-    this.fetchApiData.userLogin(this.userData).subscribe((result) => {
-      // Logic for a successful user registration goes here! (To be implemented)
-      this.dialogRef.close(); // This will close the modal on success!
-
-      localStorage.setItem('user', JSON.stringify(result.user));
-      localStorage.setItem('token', result.token);
-
+    this.fetchApiData.userLogin(this.loginData).subscribe((result) => {
       console.log(result);
-      this.snackBar.open(`Welcome ${this.userData.Username}`, 'OK', {
+      localStorage.setItem('user', result.user.Username);
+      localStorage.setItem('token', result.token);
+      this.dialogRef.close();
+      this.snackBar.open(`Welcome ${this.loginData.Username}`, 'OK', {
         duration: 2000
       });
       this.router.navigate(['movies']);
     }, (result) => {
-      console.log(result);
       this.snackBar.open(result, 'OK', {
         duration: 2000
       });

@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { GenreViewComponent } from '../genre-view/genre-view.component';
 import { DirectorViewComponent } from '../director-view/director-view.component';
 import { MovieViewComponent } from '../movie-view/movie-view.component';
-import { Router } from '@angular/router';
+
 
 
 
@@ -16,31 +16,19 @@ import { Router } from '@angular/router';
 })
 export class MovieCardComponent implements OnInit {
   // variable declared as an array. Movies returned from API will be kept here
-  movies: any[] = [];
-  username: any = localStorage.getItem('user');
-  user: any = JSON.parse(this.username);
-  currentUser: any = null;
-  currentFavs: any[] = [];
-  isInFavs: boolean = false;
+  movies: any = [];
+  FavoriteMovies: any[] = [];
+  user: any[] = [];
 
   constructor(
     public fetchApiData: UserRegistrationService,
     public dialog: MatDialog,
-    public router: Router,
     public snackBar: MatSnackBar,
   ) { }
 
   ngOnInit(): void {
     this.getMovies();
-    this.getCurrentUser();
-  }
-
-  getCurrentUser(): void {
-    this.fetchApiData.getUser().subscribe((resp: any) => {
-      this.currentUser = resp;
-      this.currentFavs = resp.Favorites;
-      return (this.currentUser, this.currentFavs);
-    });
+    this.getFavoriteMovies();
   }
 
   // function to fetch the movies from the fetchApi Data service
@@ -49,6 +37,14 @@ export class MovieCardComponent implements OnInit {
       this.movies = resp;
       console.log(this.movies);
       return this.movies;
+    });
+  }
+
+  getFavoriteMovies(): void {
+    const user = localStorage.getItem('user');
+    this.fetchApiData.getUser(user).subscribe((resp: any) => {
+      this.FavoriteMovies = resp.FavoriteMovies;
+      console.log(this.FavoriteMovies);
     });
   }
 
@@ -91,44 +87,33 @@ export class MovieCardComponent implements OnInit {
     });
   }
 
-  toggleFavs(movieId: string): void {
-    if (this.currentFavs.filter(function (e: any) { return e._id === movieId; }).length > 0) {
-      this.removeFromFavs(movieId);
-      this.isInFavs = false;
-    } else {
-      this.addToFavs(movieId)
-      this.isInFavs = true;
-    }
-  }
-
-  addToFavs(movieId: string): void {
-    //checking if the title is already in favs
-    if (this.currentFavs.filter(function (e: any) { return e._id === movieId; }).length > 0) {
-      this.snackBar.open('Already in your favs', 'OK', { duration: 2000 });
-      return
-    } else {
-      this.fetchApiData.addFavoriteMovies(movieId).subscribe((resp: any) => {
-        this.getCurrentUser();
-        this.ngOnInit();
-        this.snackBar.open('Added to favs', 'OK', { duration: 2000 });
+  addFavoriteMovie(MovieID: string, title: string): void {
+    this.fetchApiData.addFavoriteMovies(MovieID).subscribe(() => {
+      this.snackBar.open(`${title} has been added to your favorites!`, 'OK', {
+        duration: 4000,
       });
-    }
-  }
-
-  removeFromFavs(movieId: string): void {
-    this.fetchApiData.deleteFavoriteMovies(movieId).subscribe((resp: any) => {
-      this.snackBar.open('Removed from favs', 'OK', { duration: 2000 });
-      this.getCurrentUser();
       this.ngOnInit();
-      2000
     });
+    return this.getFavoriteMovies();
   }
 
-  favCheck(movieId: string): any {
-    let favIds = this.currentFavs.map(function (fav: any) { return fav._id });
-    if (favIds.includes(movieId)) {
-      this.isInFavs = true;
-      return this.isInFavs;
-    };
+  removeFavoriteMovie(MovieId: string, title: string): void {
+    this.fetchApiData.deleteFavoriteMovies(MovieId).subscribe(() => {
+      this.snackBar.open(`${title} has been removed from your favorites`, 'OK', {
+        duration: 4000,
+      });
+      this.ngOnInit();
+    });
+    return this.getFavoriteMovies();
+  }
+
+  isFavorite(MovieID: string): boolean {
+    return this.FavoriteMovies.some((movie) => movie._id === MovieID);
+  }
+
+  toggleFavorite(movie: any): void {
+    this.isFavorite(movie._id)
+      ? this.removeFavoriteMovie(movie._id, movie.Title)
+      : this.addFavoriteMovie(movie._id, movie.Title);
   }
 }
