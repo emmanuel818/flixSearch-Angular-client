@@ -6,13 +6,10 @@ import { GenreViewComponent } from '../genre-view/genre-view.component';
 import { DirectorViewComponent } from '../director-view/director-view.component';
 import { MovieViewComponent } from '../movie-view/movie-view.component';
 
-
-
-
 @Component({
   selector: 'app-movie-card',
   templateUrl: './movie-card.component.html',
-  styleUrls: ['./movie-card.component.scss']
+  styleUrls: ['./movie-card.component.scss'],
 })
 export class MovieCardComponent implements OnInit {
   // variable declared as an array. Movies returned from API will be kept here
@@ -23,8 +20,8 @@ export class MovieCardComponent implements OnInit {
   constructor(
     public fetchApiData: UserRegistrationService,
     public dialog: MatDialog,
-    public snackBar: MatSnackBar,
-  ) { }
+    public snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
     this.getMovies();
@@ -48,21 +45,21 @@ export class MovieCardComponent implements OnInit {
     });
   }
 
-  openGenreDialog(
-    name: string,
-    description: string
-  ): void {
+  openGenreDialog(name: string, description: string): void {
     this.dialog.open(GenreViewComponent, {
       data: {
         Name: name,
-        Description: description
+        Description: description,
       },
-      width: '500px'
+      width: '500px',
     });
   }
 
   openDirectorDialog(
-    name: string, bio: string, birthyear: string, deathyear: string
+    name: string,
+    bio: string,
+    birthyear: string,
+    deathyear: string
   ): void {
     this.dialog.open(DirectorViewComponent, {
       data: {
@@ -71,11 +68,16 @@ export class MovieCardComponent implements OnInit {
         Birthyear: birthyear,
         Deathyear: deathyear,
       },
-      width: '500px'
+      width: '500px',
     });
   }
 
-  openSynopsisDialog(title: string, imageUrl: any, description: string, genre: string): void {
+  openSynopsisDialog(
+    title: string,
+    imageUrl: any,
+    description: string,
+    genre: string
+  ): void {
     this.dialog.open(MovieViewComponent, {
       data: {
         Title: title,
@@ -83,7 +85,7 @@ export class MovieCardComponent implements OnInit {
         Description: description,
         Genre: genre,
       },
-      width: '500px'
+      width: '500px',
     });
   }
 
@@ -99,16 +101,20 @@ export class MovieCardComponent implements OnInit {
 
   removeFavoriteMovie(MovieId: string, title: string): void {
     this.fetchApiData.deleteFavoriteMovies(MovieId).subscribe(() => {
-      this.snackBar.open(`${title} has been removed from your favorites`, 'OK', {
-        duration: 4000,
-      });
+      this.snackBar.open(
+        `${title} has been removed from your favorites`,
+        'OK',
+        {
+          duration: 4000,
+        }
+      );
       this.ngOnInit();
     });
     return this.getFavoriteMovies();
   }
 
   isFavorite(MovieID: string): boolean {
-    return this.FavoriteMovies.some((movie) => movie._id === MovieID);
+    return this.FavoriteMovies.includes(MovieID);
   }
 
   toggleFavorite(movie: any): void {
