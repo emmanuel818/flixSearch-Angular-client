@@ -14,6 +14,10 @@ export class UpdateUserComponent implements OnInit {
   Username = localStorage.getItem('user');
   user: any = {}
 
+  /**
+   * Binding input values to userProfile object
+   */
+
   @Input() userProfile = {
     Username: this.user.Username,
     Password: this.user.Password,
@@ -32,6 +36,9 @@ export class UpdateUserComponent implements OnInit {
     this.getUser();
   }
 
+  /**
+   * get user info
+   */
   getUser(): void {
     const user = localStorage.getItem('user');
     this.fetchApiData.getUser(user).subscribe((resp: any) => {
@@ -39,8 +46,14 @@ export class UpdateUserComponent implements OnInit {
     });
   }
 
+  /**
+   * update the user information in API
+   * @function updateUserProfile
+   * @return an updated user in JSON format
+   * the stores it in localstorage, and a popup message is displayed upon successful update
+   */
   updateUserProfile(): void {
-    this.fetchApiData.updateUserProfile(this.Username, this.userProfile).subscribe(() => {
+    this.fetchApiData.updateUserProfile(this.userProfile).subscribe(() => {
       this.dialogRef.close();
 
       localStorage.setItem('Username', this.userProfile.Username);
